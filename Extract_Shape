@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 18 12:38:42 2025
+
+@author: sp1v23
+"""
+
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+# 1. Read the shapefile
+shapefile_path = "C:/Users/sp1v23/Downloads/National_Parks_England_-4082557758695841082/National_Parks_(England)___Natural_England.shp"  # Replace with your shapefile path
+
+gdf = gpd.read_file(shapefile_path)
+
+#print(gdf)  
+print(gdf.info())
+print(gdf["NAME"])
+#print(gdf.head())
+
+
+# 2. Identify the region to extract (by "NAME" attribute)
+target_region_name = "NEW FOREST"  # Exact name as in your attribute table
+target_region = gdf[gdf["NAME"] == target_region_name]
+
+# 3. Check if the region was found (handle potential case mismatch)
+if len(target_region) == 0:
+    # Check for potential case mismatches (e.g., "New forest", "new Forest")
+    for name in gdf["NAME"]:
+        if name.upper() == target_region_name.upper():  # Case-insensitive comparison
+            target_region = gdf[gdf["NAME"] == name]
+            print(f"Found region '{name}' (case-insensitive match).")
+            break  # Stop searching once found
+    if len(target_region) == 0:  # If still not found after case-insensitive search
+        print(f"Region '{target_region_name}' not found in the shapefile (including case-insensitive search).")
+else:
+    # 4. Save the extracted region to a new shapefile 
+    output_path = "Z:/Som_P/WCC/EOCIS_shapefiles/new_forest.shp"  
+    target_region.to_file(output_path)
+    print(f"Extracted region saved to: {output_path}")
+
+    # 5. Display the extracted region 
+    print(target_region)
+
+    # --- Plotting the shapefile ---
+    fig, ax = plt.subplots(figsize=(8, 6))  
+    target_region.plot(ax=ax, color='green', edgecolor='black')  
+    ax.set_title("New Forest Boundary")
+    plt.show()
