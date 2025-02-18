@@ -1,0 +1,44 @@
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+# 1. Read the shapefile
+shapefile_path = "Z:/Som_P/WCC/EOCIS_shapefiles/new_forest.shp"  # original shapefile path
+gdf = gpd.read_file(shapefile_path)
+
+# 2. Check the CRS (Coordinate Reference System)
+print(f"Original CRS: {gdf.crs}")
+
+# 3. Reproject to EPSG:4326 if necessary
+target_crs = "epsg:4326"
+output_path_reprojected = "Z:/Som_P/WCC/EOCIS_shapefiles/new_forest_epsg4326.shp"
+
+if gdf.crs != target_crs:
+    try:
+        gdf_reprojected = gdf.to_crs(target_crs)
+        print(f"Reprojected to CRS: {gdf_reprojected.crs}")
+
+        # Save the reprojected shapefile
+        gdf_reprojected.to_file(output_path_reprojected)  # Save the reprojected GeoDataFrame
+        print(f"Reprojected shapefile saved to: {output_path_reprojected}")
+
+
+        # Plot the reprojected shapefile
+        fig, ax = plt.subplots(figsize=(8, 6))
+        gdf_reprojected.plot(ax=ax, color='green', edgecolor='black')
+        ax.set_title("New Forest Boundary (EPSG:4326)")
+        plt.show()
+
+    except Exception as e:
+        print(f"Error during reprojection or saving: {e}")
+else:
+    print("Shapefile is already in EPSG:4326")
+    output_path_reprojected = "Z:/Som_P/WCC/EOCIS_shapefiles/new_forest_epsg4326.shp"
+    gdf.to_file(output_path_reprojected)  # Save the GeoDataFrame
+    print(f"Shapefile saved to: {output_path_reprojected}")
+
+    # Plot the shapefile directly
+    fig, ax = plt.subplots(figsize=(8, 6))
+    gdf.plot(ax=ax, color='green', edgecolor='black')
+    ax.set_title("New Forest Boundary (EPSG:4326)")
+    plt.show() 
+    
